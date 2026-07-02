@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ჭკვიანი მენიუ</string>
+    <string name="header_title">ჭკვიანი მენიუ</string>
+    <string name="ingredients_label">ინგრედიენტები:</string>
+    <string name="instructions_label">მომზადების წესი:</string>
+    <string name="back_desc">უკან</string>
+</resources>
