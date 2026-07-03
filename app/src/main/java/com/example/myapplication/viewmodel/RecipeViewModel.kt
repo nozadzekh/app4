@@ -24,7 +24,7 @@ class RecipeViewModel : ViewModel() {
             val matchesCategory = category == "ყველა" || recipe.category == category
             matchesQuery && matchesCategory
         }
-    }.asLiveData()
+    }.asLiveData(viewModelScope.coroutineContext)
 
     private val _randomRecipe = MutableLiveData<Recipe?>()
     val randomRecipe: LiveData<Recipe?> get() = _randomRecipe
