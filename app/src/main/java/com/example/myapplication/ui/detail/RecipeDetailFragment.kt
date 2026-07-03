@@ -5,17 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.myapplication.databinding.FragmentRecipeDetailBinding
-import com.example.myapplication.viewmodel.RecipeViewModel
+import com.example.myapplication.model.Recipe
 
 class RecipeDetailFragment : Fragment() {
 
     private var _binding: FragmentRecipeDetailBinding? = null
     private val binding get() = _binding!!
-
-    private val viewModel: RecipeViewModel by activityViewModels()
+    
+    private val args: RecipeDetailFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,23 +30,27 @@ class RecipeDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.backButton.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
+        val recipe = args.recipe
+        setupUI(recipe)
 
-        viewModel.selectedRecipe.observe(viewLifecycleOwner) { recipe ->
-            recipe?.let {
-                binding.detailTitle.text = it.title
-                binding.detailCategory.text = it.category
-                binding.detailIngredients.text = it.ingredients.joinToString("\n• ", prefix = "• ")
-                binding.detailInstructions.text = it.instructions
-
-                Glide.with(this)
-                    .load(it.imageUrl)
-                    .centerCrop()
-                    .into(binding.detailImage)
-            }
+        binding.detailToolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
         }
+    }
+
+    private fun setupUI(recipe: Recipe) {
+        binding.detailTitle.text = recipe.title
+        binding.detailCategory.text = recipe.category
+        binding.detailIngredients.text = recipe.ingredients.joinToString("\n• ", prefix = "• ")
+        binding.detailInstructions.text = recipe.instructions
+        binding.detailTime.text = recipe.prepTime
+        binding.detailDifficulty.text = recipe.difficulty
+
+        Glide.with(this)
+            .load(recipe.imageUrl)
+            .placeholder(android.R.drawable.ic_menu_gallery)
+            .centerCrop()
+            .into(binding.detailImage)
     }
 
     override fun onDestroyView() {

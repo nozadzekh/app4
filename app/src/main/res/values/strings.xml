@@ -1,7 +1,29 @@
 <resources>
     <string name="app_name">ჭკვიანი მენიუ</string>
-    <string name="header_title">ჭკვიანი მენიუ</string>
-    <string name="ingredients_label">ინგრედიენტები:</string>
-    <string name="instructions_label">მომზადების წესი:</string>
-    <string name="back_desc">უკან</string>
+    <string name="title_recipes">რეცეპტები</string>
+    <string name="title_planner">მენიუს დაგეგმვა</string>
+    <string name="title_favorites">ფავორიტები</string>
+    <string name="title_details">დეტალები</string>
+
+    <string name="category_georgian">ქართული</string>
+    <string name="category_italian">იტალიური</string>
+    <string name="category_asian">აზიური</string>
+    <string name="category_dessert">დესერტი</string>
+
+    <string name="label_ingredients">ინგრედიენტები:</string>
+    <string name="label_instructions">მომზადების წესი:</string>
+    <string name="label_prep_time">მომზადების დრო:</string>
+    <string name="label_difficulty">სირთულე:</string>
+
+    <string name="difficulty_easy">მარტივი</string>
+    <string name="difficulty_medium">საშუალო</string>
+    <string name="difficulty_hard">რთული</string>
+
+    <string name="btn_generate_menu">მენიუს გენერირება</string>
+    <string name="planner_description">დააჭირეთ ღილაკს და მე შეგირჩევთ დღევანდელ მენიუს!</string>
+    <string name="smart_suggestion">ჩემი რჩევაა:</string>
+
+    <!-- Drawer strings -->
+    <string name="navigation_drawer_open">გახსნა</string>
+    <string name="navigation_drawer_close">დახურვა</string>
 </resources>

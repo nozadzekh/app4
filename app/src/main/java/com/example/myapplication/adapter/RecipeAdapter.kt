@@ -18,23 +18,29 @@ class RecipeAdapter(private val onRecipeClick: (Recipe) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
-        val recipe = getItem(position)
-        holder.bind(recipe, onRecipeClick)
+        holder.bind(getItem(position))
     }
 
-    class RecipeViewHolder(private val binding: ItemRecipeBinding) :
+    inner class RecipeViewHolder(private val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(recipe: Recipe, onRecipeClick: (Recipe) -> Unit) {
+        
+        fun bind(recipe: Recipe) {
             binding.recipeTitle.text = recipe.title
             binding.recipeCategory.text = recipe.category
             binding.recipeDescription.text = recipe.description
+            binding.recipeTime.text = recipe.prepTime
+            binding.recipeDifficulty.text = recipe.difficulty
             
             Glide.with(binding.recipeImage.context)
                 .load(recipe.imageUrl)
+                .placeholder(android.R.drawable.progress_horizontal)
+                .error(android.R.drawable.stat_notify_error)
                 .centerCrop()
                 .into(binding.recipeImage)
 
-            binding.root.setOnClickListener { onRecipeClick(recipe) }
+            binding.root.setOnClickListener {
+                onRecipeClick(recipe)
+            }
         }
     }
 

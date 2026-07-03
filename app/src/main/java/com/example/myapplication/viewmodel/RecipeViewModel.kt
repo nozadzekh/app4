@@ -1,31 +1,50 @@
 package com.example.myapplication.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.myapplication.model.Recipe
 import com.example.myapplication.model.RecipeRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class RecipeViewModel : ViewModel() {
-    private val _recipes = MutableLiveData<List<Recipe>>()
-    val recipes: LiveData<List<Recipe>> get() = _recipes
+    private val repository = RecipeRepository()
+    
+    private val _searchQuery = MutableStateFlow("")
+    private val _selectedCategory = MutableStateFlow("ყველა")
 
-    private val _selectedRecipe = MutableLiveData<Recipe?>()
-    val selectedRecipe: LiveData<Recipe?> get() = _selectedRecipe
+    val recipes: LiveData<List<Recipe>> = combine(
+        repository.getRecipes(),
+        _searchQuery,
+        _selectedCategory
+    ) { all, query, category ->
+        all.filter { recipe ->
+            val matchesQuery = recipe.title.lowercase().contains(query.lowercase()) || 
+                               recipe.description.lowercase().contains(query.lowercase())
+            val matchesCategory = category == "ყველა" || recipe.category == category
+            matchesQuery && matchesCategory
+        }
+    }.asLiveData()
+
+    private val _randomRecipe = MutableLiveData<Recipe?>()
+    val randomRecipe: LiveData<Recipe?> get() = _randomRecipe
 
     init {
-        loadRecipes()
+        repository.initializeDataIfNeeded()
     }
 
-    private fun loadRecipes() {
-        _recipes.value = RecipeRepository.getRecipes()
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
     }
 
-    fun selectRecipe(recipe: Recipe) {
-        _selectedRecipe.value = recipe
+    fun setCategory(category: String) {
+        _selectedCategory.value = category
     }
 
-    fun clearSelection() {
-        _selectedRecipe.value = null
+    fun generateRandomRecipe() {
+        val currentRecipes = recipes.value
+        if (!currentRecipes.isNullOrEmpty()) {
+            _randomRecipe.value = currentRecipes.random()
+        }
     }
 }

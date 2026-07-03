@@ -1,78 +1,117 @@
 package com.example.myapplication.model
 
-object RecipeRepository {
-    fun getRecipes(): List<Recipe> {
-        return listOf(
-            Recipe(
-                1, "ხინკალი", "ქართული სამზარეულოს სიამაყე.",
-                listOf("ფქვილი", "ხორცი", "ხახვი", "წიწაკა", "მარილი"),
-                "მოზილეთ ცომი, მოამზადეთ ფარში, გამოახვიეთ და მოხარშეთ ადუღებულ წყალში.",
-                "https://images.unsplash.com/photo-1626128665085-483747621778?q=80&w=500",
-                "ქართული"
-            ),
-            Recipe(
-                2, "პიცა მარგარიტა", "კლასიკური იტალიური პიცა.",
-                listOf("ცომი", "პომიდვრის სოუსი", "მოცარელა", "ბაზილიკი"),
-                "გააბრტყელეთ ცომი, წაუსვით სოუსი, დაალაგეთ ყველი და გამოაცხვეთ ღუმელში.",
-                "https://images.unsplash.com/photo-1574071318508-1cdbad80ad50?q=80&w=500",
-                "იტალიური"
-            ),
-            Recipe(
-                3, "სუში მოზაიკა", "იაპონური ტრადიციული კერძი.",
-                listOf("ბრინჯი", "ნორი", "ორაგული", "ავოკადო"),
-                "მოხარშეთ ბრინჯი, დაალაგეთ ინგრედიენტები ნორიზე და გადაახვიეთ.",
-                "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=500",
-                "აზიური"
-            ),
-            Recipe(
-                4, "აჭარული ხაჭაპური", "ნავის ფორმის ხაჭაპური კვერცხით.",
-                listOf("ცომი", "ყველი", "კვერცხი", "კარაქი"),
-                "მოამზადეთ ნავის ფორმის ცომი, ჩადეთ ყველი და ბოლოს დაახალეთ კვერცხი.",
-                "https://images.unsplash.com/photo-1605333396915-47ed6b68a00e?q=80&w=500",
-                "ქართული"
-            ),
-            Recipe(
-                5, "ლაზანია", "ფენოვანი იტალიური კერძი.",
-                listOf("ლაზანიას ფირფიტები", "ფარში", "ბეშამელის სოუსი", "ყველი"),
-                "დააწყვეთ ფენებად ფირფიტები, სოუსი და ხორცი, შემდეგ გამოაცხვეთ.",
-                "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=500",
-                "იტალიური"
-            ),
-            Recipe(
-                6, "ტომ იამი", "ცხარე ტაილანდური წვნიანი.",
-                listOf("კრევეტები", "ლაიმი", "სოკო", "ჩილი"),
-                "მოხარშეთ ბულიონი სანელებლებით, დაამატეთ კრევეტები და ბოსტნეული.",
-                "https://images.unsplash.com/photo-1548943487-a2e4e43b4853?q=80&w=500",
-                "აზიური"
-            ),
-            Recipe(
-                7, "საცივი", "საახალწლო ქართული კერძი.",
-                listOf("ინდაური", "ნიგოზი", "სანელებლები", "ხახვი"),
-                "მოხარშეთ ინდაური, მოამზადეთ ნიგვზიანი სოუსი და შეურიეთ ერთმანეთს.",
-                "https://images.unsplash.com/photo-1604544215162-a74061c9fb8d?q=80&w=500",
-                "ქართული"
-            ),
-            Recipe(
-                8, "ბურგერი", "ამერიკული კლასიკა.",
-                listOf("ფუნთუშა", "კოტლეტი", "ყველი", "სალათის ფოთოლი"),
-                "შეწვით ხორცი, დაალაგეთ ფუნთუშაში სხვა ინგრედიენტებთან ერთად.",
-                "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=500",
-                "ამერიკული"
-            ),
-            Recipe(
-                9, "სალათი ცეზარი", "ყველაზე პოპულარული სალათი.",
-                listOf("სალათის ფურცლები", "ქათამი", "ორცხობილა", "სოუსი"),
-                "დაჭერით ქათამი, აურიეთ სალათის ფოთლებში და მოასხით სოუსი.",
-                "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?q=80&w=500",
-                "საერთაშორისო"
-            ),
-            Recipe(
-                10, "ფახლავა", "ტკბილი თაფლიანი დესერტი.",
-                listOf("ფენოვანი ცომი", "ნიგოზი", "თაფლი", "შაქარი"),
-                "დააწყვეთ ფენები, ჩააყოლეთ ნიგოზი და ბოლოს მოასხით თაფლის ვაჟინი.",
-                "https://images.unsplash.com/photo-1519676867240-f03562e64548?q=80&w=500",
-                "დესერტი"
-            )
+import android.util.Log
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onStart
+
+class RecipeRepository {
+    private val initialRecipes = listOf(
+        Recipe(
+            "1", 
+            "ხინკალი კლასიკური", 
+            "ქართული სამზარეულოს სიამაყე. წვნიანი, არომატული და ნამდვილი მთიულური რეცეპტით მომზადებული ხინკალი.", 
+            listOf("საქონლის და ღორის ფარში (შერეული) - 1კგ", "ხახვი - 2 ცალი", "ძირა, წიწაკა, მარილი - გემოვნებით", "ფქვილი - 1.5კგ"), 
+            "1. მოზილეთ მაგარი ცომი...\n2. ფარშს დაუმატეთ სანელებლები და წყალი...", 
+            "https://images.unsplash.com/photo-1599481238505-b8b0537a3f77?q=80&w=800", 
+            "ქართული", 
+            "60 წთ", 
+            "რთული"
+        ),
+        Recipe(
+            "2", 
+            "პიცა მარგარიტა", 
+            "ნამდვილი იტალიური პიცა თხელი ცომით, ცოცხალი რეჰანითა და უმაღლესი ხარისხის მოცარელათი.", 
+            listOf("პიცის ცომი - 300გრ", "ტომატის სოუსი - 100გრ", "მოცარელა - 200გრ"), 
+            "1. გააცხელეთ ღუმელი მაქსიმუმზე...\n2. გააბრტყელეთ ცომი და გამოაცხვეთ...", 
+            "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?q=80&w=800", 
+            "იტალიური", 
+            "25 წთ", 
+            "მარტივი"
+        ),
+        Recipe(
+            "3", 
+            "აჭარული ხაჭაპური", 
+            "ოქროსფერი ნავი, სადაც გამდნარი ყველი, კარაქი და კვერცხი საოცარ გემოს ქმნის.", 
+            listOf("ცომი - 400გრ", "ყველი - 500გრ", "კვერცხი - 1 ცალი"), 
+            "1. ცომს მიეცით ნავის ფორმა...\n2. ჩადეთ ყველი და გამოაცხვეთ...", 
+            "https://images.unsplash.com/photo-1605333396915-47ed6b68a00e?q=80&w=800", 
+            "ქართული", 
+            "40 წთ", 
+            "საშუალო"
+        ),
+        Recipe(
+            "4", 
+            "ორაგულის სუში როლი", 
+            "ახალი ორაგულით, კრემ-ყველითა და ავოკადოთი მომზადებული პრემიუმ ხარისხის როლები.", 
+            listOf("ბრინჯი - 200გრ", "ორაგული - 100გრ", "ავოკადო - 1/2 ცალი"), 
+            "1. მოხარშეთ ბრინჯი სპეციალურად...\n2. გადაახვიეთ ნორიში...", 
+            "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=800", 
+            "აზიური", 
+            "45 წთ", 
+            "რთული"
+        ),
+        Recipe(
+            "5", 
+            "შოკოლადის ბრაუნი", 
+            "სველი, ინტენსიური შოკოლადის გემო და ხრაშუნა ზედაპირი.", 
+            listOf("შოკოლადი - 200გრ", "კარაქი - 150გრ", "შაქარი - 200გრ"), 
+            "1. გაადნეთ შოკოლადი...\n2. გამოაცხვეთ 180 გრადუსზე...", 
+            "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=800", 
+            "დესერტი", 
+            "35 წთ", 
+            "მარტივი"
         )
+    )
+
+    // თუ Firebase-ის URL არასწორია, აქ მიუთითეთ თქვენი კონსოლიდან აღებული ლინკი
+    private val database = try {
+        FirebaseDatabase.getInstance("https://my-application-17da8-default-rtdb.firebaseio.com/").getReference("recipes")
+    } catch (e: Exception) {
+        null
+    }
+
+    fun getRecipes(): Flow<List<Recipe>> = callbackFlow {
+        // დაუყოვნებლივ ვაგზავნით ლოკალურ მონაცემებს
+        trySend(initialRecipes).isSuccess
+
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val recipes = snapshot.children.mapNotNull { it.getValue(Recipe::class.java) }
+                    if (recipes.isNotEmpty()) {
+                        Log.d("RecipeRepository", "Firebase data received: ${recipes.size}")
+                        trySend(recipes).isSuccess
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("RecipeRepository", "Firebase error: ${error.message}")
+            }
+        }
+        
+        database?.addValueEventListener(listener)
+        awaitClose { database?.removeEventListener(listener) }
+    }.onStart { emit(initialRecipes) }
+
+    fun initializeDataIfNeeded() {
+        database?.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) {
+                    initialRecipes.forEach { recipe ->
+                        database.child(recipe.id).setValue(recipe)
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("RecipeRepository", "Sync failed: ${error.message}")
+            }
+        })
     }
 }
